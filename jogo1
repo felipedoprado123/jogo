@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Quadrado Saltador</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #222;
+    }
+    canvas {
+      display: block;
+      margin: auto;
+      background: #eee;
+      border: 2px solid #444;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center; color:white;">Quadrado Saltador</h1>
+  <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const player = {
+      x: 50,
+      y: 300,
+      width: 40,
+      height: 40,
+      color: "#3498db",
+      dx: 0,
+      dy: 0,
+      speed: 4,
+      jumpForce: -12,
+      onGround: false
+    };
+
+    const gravity = 0.6;
+    const groundY = 350;
+
+    const keys = {
+      left: false,
+      right: false,
+      up: false
+    };
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "a") keys.left = true;
+      if (e.key === "ArrowRight" || e.key === "d") keys.right = true;
+      if (e.key === "ArrowUp" || e.key === "w") keys.up = true;
+    });
+
+    document.addEventListener("keyup", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "a") keys.left = false;
+      if (e.key === "ArrowRight" || e.key === "d") keys.right = false;
+      if (e.key === "ArrowUp" || e.key === "w") keys.up = false;
+    });
+
+    function update() {
+      // Movimento horizontal
+      if (keys.left) player.dx = -player.speed;
+      else if (keys.right) player.dx = player.speed;
+      else player.dx = 0;
+
+      // Pulo
+      if (keys.up && player.onGround) {
+        player.dy = player.jumpForce;
+        player.onGround = false;
+      }
+
+      // Gravidade
+      player.dy += gravity;
+
+      // Atualizar posição
+      player.x += player.dx;
+      player.y += player.dy;
+
+      // Colisão com o chão
+      if (player.y + player.height >= groundY) {
+        player.y = groundY - player.height;
+        player.dy = 0;
+        player.onGround = true;
+      }
+
+      // Limites da tela
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Chão
+      ctx.fillStyle = "#2ecc71";
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+
+      // Jogador
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+  </script>
+</body>
+</html>
