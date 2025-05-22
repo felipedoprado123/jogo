@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Quadrado Saltador</title>
+  <title>Quadrado Saltador com Imagem</title>
   <style>
     * {
       margin: 0;
@@ -22,7 +22,7 @@
   </style>
 </head>
 <body>
-  <h1 style="text-align:center; color:white;">Quadrado Saltador</h1>
+  <h1 style="text-align:center; color:white;">Jogo com Personagem</h1>
   <canvas id="gameCanvas" width="600" height="400"></canvas>
 
   <script>
@@ -34,7 +34,6 @@
       y: 300,
       width: 40,
       height: 40,
-      color: "#3498db",
       dx: 0,
       dy: 0,
       speed: 4,
@@ -51,6 +50,9 @@
       up: false
     };
 
+    const playerImage = new Image();
+    playerImage.src = "personagem.png"; // Coloque sua imagem aqui
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft" || e.key === "a") keys.left = true;
       if (e.key === "ArrowRight" || e.key === "d") keys.right = true;
@@ -64,32 +66,25 @@
     });
 
     function update() {
-      // Movimento horizontal
       if (keys.left) player.dx = -player.speed;
       else if (keys.right) player.dx = player.speed;
       else player.dx = 0;
 
-      // Pulo
       if (keys.up && player.onGround) {
         player.dy = player.jumpForce;
         player.onGround = false;
       }
 
-      // Gravidade
       player.dy += gravity;
-
-      // Atualizar posição
       player.x += player.dx;
       player.y += player.dy;
 
-      // Colisão com o chão
       if (player.y + player.height >= groundY) {
         player.y = groundY - player.height;
         player.dy = 0;
         player.onGround = true;
       }
 
-      // Limites da tela
       if (player.x < 0) player.x = 0;
       if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
     }
@@ -101,9 +96,8 @@
       ctx.fillStyle = "#2ecc71";
       ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
 
-      // Jogador
-      ctx.fillStyle = player.color;
-      ctx.fillRect(player.x, player.y, player.width, player.height);
+      // Jogador com imagem
+      ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
     }
 
     function loop() {
@@ -112,7 +106,10 @@
       requestAnimationFrame(loop);
     }
 
-    loop();
+    // Esperar imagem carregar antes de iniciar
+    playerImage.onload = () => {
+      loop();
+    };
   </script>
 </body>
 </html>
